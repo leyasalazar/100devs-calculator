@@ -27,25 +27,38 @@ const calculator = {
                 this.clearAll()
                 break;
             case '.' : 
-                if(this.displayText == '0'){
-                    this.addText('0.')
-                } else {
-                    if(this.displayText.includes(value)){
-                        return
-                    } else {
-                        this.addText(value)
-                    }
-                    
-                }
+                this.addDecimal(value)
                 break;
             default: 
                 this.addText(value)
                 // break;
         }
     },
-    addDecimal(value){
 
+    addDecimal(value){
+        if(this.displayText === '0'){
+            this.addText('0.')
+        } else if(this.prevTotal !== null || this.displayText.endsWith(value)){
+            return
+        } else if (this.displayText.endsWith('-') || this.displayText.endsWith('+') || this.displayText.endsWith('/') || this.displayText.endsWith('*')){
+            this.displayText += '0.'
+        } else if ((this.displayText.includes(value)) && !(this.displayText.includes('-') || this.displayText.includes('+') || this.displayText.includes('/') || this.displayText.includes('*'))) {
+            return
+        } else if(this.displayText.includes('-') || this.displayText.includes('+') || this.displayText.includes('/') || this.displayText.includes('*')){
+                const regex = /[/*-+]/
+                let separate = this.displayText.split(this.displayText.match(regex)[0])
+                if(separate[1].includes(value)){
+                    return
+                } else {
+                    this.addText(value)
+                }
+        }  
+        else {
+            this.addText(value)
+        }
+        
     },
+
     addText(value) {
         if(this.displayText === '0'){
             this.displayText = ''
@@ -67,7 +80,7 @@ const calculator = {
     },
 
     calcAnswer(equation){
-        let result = Function("return " + equation)()
+        let result = Function("return " + equation)().toFixed(5)
         !(this.displayText == 0) && this.outputText(result)
         this.prevTotal = result
     }, 
